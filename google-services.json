@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "513767727663",
+    "project_id": "mapjetpack-90154",
+    "storage_bucket": "mapjetpack-90154.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513767727663:android:581db3170f17ebfb895cda",
+        "android_client_info": {
+          "package_name": "com.example.mapapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKtMZk33M_6pDkED_NK76JJ2DUq2DGrNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
