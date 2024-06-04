@@ -6,8 +6,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.mapapp.models.CustomMarker
 import com.example.mapapp.firebase.Repository
+import com.example.mapapp.models.CustomMarker
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 
@@ -18,8 +18,6 @@ class MapsViewModel : ViewModel() {
     val markerName = _markerName
     private val _markerDescription = MutableLiveData<String>()
     val markerDescription = _markerDescription
-    private val _iconNum = MutableLiveData<Int>()
-    val iconNum = _iconNum
     private val _selectedMarker = MutableLiveData<CustomMarker>()
     val selectedMarker = _selectedMarker
     private val _markers = MutableLiveData<MutableList<CustomMarker>>().apply {
@@ -95,9 +93,7 @@ class MapsViewModel : ViewModel() {
         _selectedMarker.value = marker
     }
 
-    fun setIconNum(num: Int) {
-        _iconNum.value = num
-    }
+
 
     fun setCameraPermission(granted: Boolean) {
         _cameraPermission.value = granted
@@ -126,9 +122,6 @@ class MapsViewModel : ViewModel() {
         markers.value = updatedMarkers as MutableList<CustomMarker>?
     }
 
-    fun setEditDialogOpener(value: Boolean) {
-        _editDialogOpener.value = value
-    }
 
     fun setMail(email: String) {
         _email.value = email
