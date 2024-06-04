@@ -1,0 +1,269 @@
+package com.example.mapapp.view
+
+import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import com.example.mapapp.data.UserPrefs
+import com.example.mapapp.navigations.Routes
+import com.example.mapapp.viewModel.MapsViewModel
+import com.example.mapsapps.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+fun LogInScreen(navController: NavController, mapsViewModel: MapsViewModel) {
+    val context = LocalContext.current
+    val userPrefs = UserPrefs(context)
+    val storedUserData = userPrefs.getUserData.collectAsState(initial = emptyList())
+    val email by mapsViewModel.email.observeAsState("")
+    val password by mapsViewModel.password.observeAsState("")
+    var passwordVisibility by remember { mutableStateOf(false) }
+    val areWeLoggedIn by mapsViewModel.areWeLoggedIn.observeAsState(false)
+    val saveData by mapsViewModel.saveData.observeAsState(false)
+
+    if (storedUserData.value.isNotEmpty() && storedUserData.value[0] != ""
+        && storedUserData.value[1] != "" && mapsViewModel.areWeLoggedInAndRemembered.value == true
+    ) {
+        mapsViewModel.setMail(storedUserData.value[0])
+        mapsViewModel.setPassword(storedUserData.value[1])
+    }
+
+
+    LaunchedEffect(areWeLoggedIn) {
+        if (areWeLoggedIn == true) {
+            navController.navigate(Routes.Map.route)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(0.9f)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    Color(0xFF95ED8F)
+                ),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.map_logo),
+                contentDescription = "icono",
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+            )
+            Text(
+                text = "Bienvenido a MapsApp! \nPor favor, inicie sesión para continuar.",
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp,
+                color = Color(0xFF1B5E03)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = { mapsViewModel.setMail(it) },
+                label = {
+                    Text(
+                        "Correo electrónico",
+                        color = Color(0xFF1B5E03),
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF1B5E03),
+                    unfocusedBorderColor = Color(0xFF1B5E03),
+                    cursorColor = Color(0xFF1B5E03),
+                    focusedTextColor = Color(0xFF1B5E03),
+                    unfocusedTextColor = Color(0xFF1B5E03),
+
+                    ),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                )
+
+            )
+            OutlinedTextField(
+                value = password,
+                onValueChange = { mapsViewModel.setPassword(it) },
+                label = {
+                    Text(
+                        "Contraseña",
+                        color = Color(0xFF1B5E03)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF1B5E03),
+                    unfocusedBorderColor = Color(0xFF1B5E03),
+                    cursorColor = Color(0xFF1B5E03),
+                    focusedTextColor = Color(0xFF1B5E03),
+                    unfocusedTextColor = Color(0xFF1B5E03),
+
+                    ),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password
+                ),
+                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { passwordVisibility = !passwordVisibility }) {
+                        Icon(
+                            imageVector = if (passwordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = "visibility",
+                            tint = Color(0xFF1B5E03)
+                        )
+                    }
+
+                }
+
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Recúerdame",
+                    color = Color(0xFF1B5E03),
+                    textDecoration = TextDecoration.Underline
+                )
+                Checkbox(
+                    checked = saveData,
+                    onCheckedChange = { mapsViewModel.setSaveData(it) },
+                    colors = CheckboxDefaults.colors(
+                        checkmarkColor = Color(0xFF95ED8F),
+                        checkedColor = Color(0xFF1B5E03),
+                        uncheckedColor = Color(0xFF1B5E03)
+                    )
+                )
+            }
+
+            Button(
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 16.dp)
+                    .fillMaxWidth(0.8f),
+                onClick = {
+                    if (email.isNotEmpty() && password.isNotEmpty() && email.contains("@") && email.contains(
+                            "."
+                        ) && password.length >= 6
+                    ) {
+                        if (saveData) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                userPrefs.saveUserData(email, password)
+                            }
+                        }
+                        mapsViewModel.loginUser(email, password)
+
+
+                    } else {
+                        mapsViewModel.setOpenerDialog(true)
+                    }
+
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFCAF8D2), contentColor = Color(0xFF1B5E03)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(text = "Iniciar sesión")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(modifier = Modifier.padding(bottom = 16.dp)) {
+                Text(
+                    "¿No tienes una cuenta? ",
+                    color = Color(0xFF1B5E03)
+                )
+                Text(
+                    text = "Regístrate",
+                    color = Color(0xFF1B5E03),
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier
+                        .clickable { navController.navigate(Routes.Register.route) })
+            }
+        }
+    }
+    FailLogInAlert(mapsViewModel)
+
+}
+
+
+@Composable
+fun FailLogInAlert(mapsViewModel: MapsViewModel) {
+    val dialogOpener by mapsViewModel.dialogOpener.observeAsState(false)
+    if (dialogOpener) {
+        Dialog(onDismissRequest = { mapsViewModel.setOpenerDialog(false) }) {
+            Surface(
+                color = Color(0xFF95ED8F),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Error al iniciar sesión, intente de nuevo.",
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFF1B5E03)
+                    )
+                }
+            }
+        }
+    }
+}
+
