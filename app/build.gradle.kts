@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mapsapps"
+    namespace = "com.example.mapapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.mapsapps"
+        applicationId = "com.example.mapapp"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
